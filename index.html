@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiDi Referral Claimer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface2: #f0f1f4;
+    --border: #e0e2e8;
+    --text: #1a1d27;
+    --text-dim: #6b7085;
+    --accent: #ff6611;
+    --accent-hover: #e8590a;
+    --green: #16a34a;
+    --red: #dc2626;
+    --radius: 10px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 520px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-bottom: 28px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  input, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--accent);
+  }
+
+  .phone-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .phone-row .code-field { flex: 0 0 100px; }
+  .phone-row .number-field { flex: 1; }
+
+  .toggle-advanced {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 0.82rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+    transition: color 0.2s;
+  }
+
+  .toggle-advanced:hover { color: var(--text); }
+
+  .toggle-advanced .arrow {
+    display: inline-block;
+    transition: transform 0.2s;
+    font-size: 0.7rem;
+  }
+
+  .toggle-advanced.open .arrow { transform: rotate(90deg); }
+
+  .advanced-fields {
+    display: none;
+    padding-top: 12px;
+  }
+
+  .advanced-fields.show { display: block; }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .field-grid .full { grid-column: 1 / -1; }
+
+  .field-group { margin-bottom: 0; }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(255,102,17,0.3);
+  }
+
+  .btn:hover { background: var(--accent-hover); }
+  .btn:active { transform: scale(0.985); }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .progress {
+    margin-top: 16px;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .step .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+
+  .step.active .dot { background: var(--accent); animation: pulse 1s infinite; }
+  .step.done .dot { background: var(--green); }
+  .step.fail .dot { background: var(--red); }
+  .step.done, .step.fail, .step.active { color: var(--text); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 16px;
+    display: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .result-card.show { display: block; }
+
+  .result-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .result-header.success { background: #ecfdf5; border-bottom: 1px solid #bbf7d0; }
+  .result-header.error { background: #fef2f2; border-bottom: 1px solid #fecaca; }
+
+  .badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .badge.success { background: var(--green); color: #fff; }
+  .badge.error { background: var(--red); color: #fff; }
+
+  .result-header .msg {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .result-body { padding: 20px; }
+
+  .reward-item {
+    padding: 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .reward-item:last-child { margin-bottom: 0; }
+
+  .reward-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+
+  .reward-row:last-child { margin-bottom: 0; }
+
+  .reward-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .reward-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .reward-value.highlight {
+    color: var(--accent);
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .join-info {
+    padding: 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .join-info .info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+  }
+
+  .join-info .info-row:last-child { margin-bottom: 0; }
+  .join-info .info-label { color: var(--text-dim); }
+
+  .raw-toggle {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    cursor: pointer;
+    padding: 10px 0 0;
+    text-decoration: underline;
+  }
+
+  .raw-toggle:hover { color: var(--text); }
+
+  .raw-json {
+    display: none;
+    margin-top: 10px;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    max-height: 300px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .raw-json.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1><span>DiDi</span> Referral Claimer</h1>
+  <p class="subtitle">Enter a phone number and claim referral discounts</p>
+
+  <div class="card">
+    <label>Phone Number</label>
+    <div class="phone-row">
+      <div class="code-field">
+        <input type="text" id="countryCallingCode" value="+61" placeholder="+61">
+      </div>
+      <div class="number-field">
+        <input type="tel" id="cell" placeholder="4XX XXX XXX" autofocus>
+      </div>
+    </div>
+
+    <button class="toggle-advanced" id="toggleBtn" type="button">
+      <span class="arrow">&#9654;</span> Advanced Settings
+    </button>
+
+    <div class="advanced-fields" id="advancedFields">
+      <div class="field-grid">
+        <div class="field-group full">
+          <label>UID</label>
+          <input type="text" id="uid" value="369436974820549">
+        </div>
+        <div class="field-group">
+          <label>Activity ID</label>
+          <input type="text" id="activityId" value="102602022">
+        </div>
+        <div class="field-group">
+          <label>Activity Type</label>
+          <input type="number" id="activityType" value="26">
+        </div>
+        <div class="field-group">
+          <label>City ID</label>
+          <input type="number" id="cityId" value="61050200">
+        </div>
+        <div class="field-group">
+          <label>County ID</label>
+          <input type="number" id="countyId" value="61020608">
+        </div>
+        <div class="field-group">
+          <label>Country Code</label>
+          <input type="text" id="countryCode" value="AU">
+        </div>
+        <div class="field-group">
+          <label>TC ID List (comma-sep)</label>
+          <input type="text" id="tcIdList" value="2602">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" id="claimBtn">Claim Discount</button>
+
+  <div class="progress" id="progress" style="display:none;">
+    <div class="step" id="step2"><span class="dot"></span> Joining referral...</div>
+    <div class="step" id="step3"><span class="dot"></span> Fetching rewards...</div>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <div class="result-header" id="resultHeader">
+      <span class="badge" id="resultBadge"></span>
+      <span class="msg" id="resultMsg"></span>
+    </div>
+    <div class="result-body" id="resultBody"></div>
+  </div>
+</div>
+
+<script>
+const BASE = 'https://growth.didiglobal.com/litchi2/api';
+
+const $ = (id) => document.getElementById(id);
+
+$('toggleBtn').addEventListener('click', () => {
+  $('toggleBtn').classList.toggle('open');
+  $('advancedFields').classList.toggle('show');
+});
+
+function getCommon() {
+  const activityId = $('activityId').value.trim();
+  return {
+    a: activityId,
+    activity_id: activityId,
+    city_id: Number($('cityId').value),
+    country_code: $('countryCode').value.trim(),
+    county_id: Number($('countyId').value),
+    uid: Number($('uid').value),
+    location_cityid: 0,
+    mock: false,
+    mock_by_key: false,
+  };
+}
+
+function randomUid() {
+  const base = 369436900000000n;
+  const range = 200000000n;
+  const rand = BigInt(Math.floor(Math.random() * Number(range)));
+  return (base + rand).toString();
+}
+
+async function post(endpoint, body) {
+  const res = await fetch(`${BASE}${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+function setStep(id, state) {
+  const el = $(id);
+  el.className = 'step ' + state;
+}
+
+function showResult(success, message, bodyHtml, rawData) {
+  const card = $('resultCard');
+  const header = $('resultHeader');
+  const badge = $('resultBadge');
+  const msg = $('resultMsg');
+  const body = $('resultBody');
+
+  card.classList.add('show');
+  header.className = 'result-header ' + (success ? 'success' : 'error');
+  badge.className = 'badge ' + (success ? 'success' : 'error');
+  badge.textContent = success ? 'Success' : 'Error';
+  msg.textContent = message;
+
+  const rawId = 'raw_' + Date.now();
+  body.innerHTML = bodyHtml +
+    `<button class="raw-toggle" onclick="document.getElementById('${rawId}').classList.toggle('show')">Toggle Raw JSON</button>` +
+    `<div class="raw-json" id="${rawId}">${escHtml(JSON.stringify(rawData, null, 2))}</div>`;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+$('claimBtn').addEventListener('click', async () => {
+  const cell = $('cell').value.trim();
+  if (!cell) { $('cell').focus(); return; }
+
+  const callingCode = $('countryCallingCode').value.trim();
+  const actType = Number($('activityType').value);
+  const tcIds = $('tcIdList').value.split(',').map(s => Number(s.trim())).filter(Boolean);
+
+  $('claimBtn').disabled = true;
+  $('resultCard').classList.remove('show');
+  $('progress').style.display = 'block';
+  $('step2').querySelector('.dot').nextSibling.textContent = ' Joining referral...';
+  $('step3').querySelector('.dot').nextSibling.textContent = ' Fetching rewards...';
+  setStep('step2', '');
+  setStep('step3', '');
+
+  const allResponses = {};
+
+  try {
+    // Steps 1+2: tc/sign then component/join (auto-retry both with random UID on USER_RISK_FORBIDDEN)
+    const MAX_RETRIES = 5;
+    let joinRes, signRes, attempt = 0;
+    while (true) {
+      attempt++;
+
+      signRes = await post('/tc/sign', {
+        ...getCommon(),
+        user_type: 0,
+        tc_id_list: tcIds,
+        cell,
+        country_calling_code: callingCode,
+        activity_type: actType,
+      });
+      allResponses['sign_attempt_' + attempt] = signRes;
+
+      if (signRes.errno !== 0) {
+        setStep('step2', 'fail');
+        showResult(false, signRes.errmsg || 'T&C sign failed', '', allResponses);
+        return;
+      }
+
+      setStep('step2', 'active');
+      joinRes = await post('/component/join', {
+        ...getCommon(),
+        user_type: 1,
+        cell,
+        country_calling_code: callingCode,
+        activity_type: actType,
+      });
+      allResponses['join_attempt_' + attempt] = joinRes;
+
+      if (joinRes.business_code === 'USER_RISK_FORBIDDEN' && attempt < MAX_RETRIES) {
+        const newUid = randomUid();
+        $('uid').value = newUid;
+        $('step2').querySelector('.dot').nextSibling.textContent =
+          ` Joining referral... (retry ${attempt}/${MAX_RETRIES}, new UID: ${newUid})`;
+        continue;
+      }
+      break;
+    }
+    allResponses.sign = signRes;
+    allResponses.join = joinRes;
+
+    if (joinRes.errno !== 0) {
+      setStep('step2', 'fail');
+      showResult(false, joinRes.errmsg || 'Join failed', '', allResponses);
+      return;
+    }
+    setStep('step2', 'done');
+
+    const joinData = joinRes.data || {};
+    const refereeUid = joinData.referee_uid || Number($('uid').value);
+
+    // Step 3: referral_component
+    setStep('step3', 'active');
+    const rewardBody = {
+      ...getCommon(),
+      uid: refereeUid,
+      user_type: 0,
+      component_package_list: ['pkg_reward_list'],
+      activity_type: actType,
+      reward_type: 0,
+      country_calling_code: callingCode,
+      cell,
+      page_num: 0,
+      page_size: 20,
+    };
+    const rewardRes = await post('/referral_component', rewardBody);
+    allResponses.referral = rewardRes;
+
+    if (rewardRes.errno !== 0) {
+      setStep('step3', 'fail');
+      showResult(false, rewardRes.errmsg || 'Reward fetch failed', buildJoinHtml(joinData, []), allResponses);
+      return;
+    }
+    setStep('step3', 'done');
+
+    const rewards = rewardRes.data?.pkg_reward_list?.com_reward_list?.data?.reward_list || [];
+    let html = buildJoinHtml(joinData, rewards);
+
+    if (rewards.length === 0) {
+      html += '<div class="reward-item"><div class="reward-row"><span class="reward-label">Info</span><span class="reward-value">No rewards returned</span></div></div>';
+    } else {
+      rewards.forEach((r, i) => {
+        const amt = r.reward_amount_localize?.[3] || (r.reward_amount / 100).toFixed(2);
+        html += `
+          <div class="reward-item">
+            <div class="reward-row">
+              <span class="reward-label">Reward ${rewards.length > 1 ? '#' + (i + 1) : ''}</span>
+              <span class="reward-value highlight">${escHtml(String(amt))}</span>
+            </div>
+            <div class="reward-row">
+              <span class="reward-label">Activity</span>
+              <span class="reward-value">${escHtml(r.activity_name || '-')}</span>
+            </div>
+            <div class="reward-row">
+              <span class="reward-label">Name</span>
+              <span class="reward-value">${escHtml(r.reward_name || '-')}</span>
+            </div>
+            <div class="reward-row">
+              <span class="reward-label">Discount</span>
+              <span class="reward-value">${r.discount != null ? r.discount + '%' : '-'}</span>
+            </div>
+            <div class="reward-row">
+              <span class="reward-label">Coupon Type</span>
+              <span class="reward-value">${r.coupon_type ?? '-'}</span>
+            </div>
+            <div class="reward-row">
+              <span class="reward-label">Expires</span>
+              <span class="reward-value">${escHtml(r.reward_expire_time || '-')}</span>
+            </div>
+            <div class="reward-row">
+              <span class="reward-label">Claimed</span>
+              <span class="reward-value">${escHtml(r.reward_get_time || '-')}</span>
+            </div>
+          </div>`;
+      });
+    }
+
+    const joinOk = joinRes.business_code === 'SUCCESS' || joinRes.business_code === 'UNDEFINED';
+    const hasRewards = rewards.length > 0;
+    const isSuccess = joinOk && hasRewards;
+    const statusText = !joinOk
+      ? joinRes.business_code || 'Unknown error'
+      : hasRewards ? 'Referral claimed' : 'No rewards returned';
+
+    if (!joinOk) setStep('step2', 'fail');
+    if (!hasRewards) setStep('step3', 'fail');
+    showResult(isSuccess, statusText, html, allResponses);
+
+  } catch (err) {
+    ['step1','step2','step3'].forEach(s => {
+      if ($(s).classList.contains('active')) setStep(s, 'fail');
+    });
+    showResult(false, err.message || 'Network error', '', allResponses);
+  } finally {
+    $('claimBtn').disabled = false;
+  }
+});
+
+function buildJoinHtml(joinData, rewards) {
+  if (!joinData || Object.keys(joinData).length === 0) return '';
+  const refereeView = rewards?.[0]?.reward_referees?.[0]?.referee_view;
+  const rows = [
+    ['Assist Status', joinData.assist_status],
+    ['Referee UID', joinData.referee_uid],
+    ['Referee', refereeView],
+  ].filter(([, v]) => v != null);
+
+  if (rows.length === 0) return '';
+  return `<div class="join-info">${rows.map(([l, v]) =>
+    `<div class="info-row"><span class="info-label">${escHtml(l)}</span><span>${escHtml(String(v))}</span></div>`
+  ).join('')}</div>`;
+}
+</script>
+
+</body>
+</html>
