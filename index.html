@@ -485,31 +485,31 @@ const $ = (id) => document.getElementById(id);
 
 const CITIES = [
   { country: 'AU', countryName: 'Australia', cities: [
-    { name: 'Gold Coast',            cityId: 61030900, countyId: 0, activityId: '102602020', activityType: 26, discount: '50% off ($15 max) x 2', referrer: '$10 x 2 + $10 x 2' },
-    { name: 'Newcastle',             cityId: 61011100, countyId: 0, activityId: '102602020', activityType: 26, discount: '50% off ($15 max) x 2', referrer: '$10 x 2 + $10 x 2' },
-    { name: 'Perth',                 cityId: 61050200, countyId: 0, activityId: '102602022', activityType: 26, discount: '50% off ($15 max) x 2', referrer: '$10 x 2 + $10 x 2' },
-    { name: 'Adelaide',               cityId: 61040100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Ballarat',              cityId: 61020100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Bendigo',               cityId: 61020200, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Brisbane',              cityId: 61030100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Bundaberg - Hervey Bay', cityId: 61031900, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Bunbury - Busselton',   cityId: 61050100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Cairns',                cityId: 61030600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Canberra',              cityId: 61080100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Central Coast',         cityId: 61010200, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Coffs Harbour',         cityId: 61010400, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Geelong',               cityId: 61020300, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Mackay',                cityId: 61031200, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Melbourne',             cityId: 61020600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Port Macquarie',        cityId: 61010800, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Rockhampton - Gladstone', cityId: 61030800, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Shepparton - Mooroopna', cityId: 61021600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Sunshine Coast',        cityId: 61031600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Sydney',                cityId: 61011500, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Toowoomba',             cityId: 61031700, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Townsville',            cityId: 61031800, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Wagga Wagga',           cityId: 61011300, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
-    { name: 'Wollongong',            cityId: 61010700, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Gold Coast',            cityId: 61030900, countyId: 0, activityId: '102602020', activityType: 26, discount: '50% off ($15 max) x 2', referrer: '$10 x 2 + $10 x 2', tz: 'Australia/Brisbane' },
+    { name: 'Newcastle',             cityId: 61011100, countyId: 0, activityId: '102602020', activityType: 26, discount: '50% off ($15 max) x 2', referrer: '$10 x 2 + $10 x 2', tz: 'Australia/Sydney' },
+    { name: 'Perth',                 cityId: 61050200, countyId: 0, activityId: '102602022', activityType: 26, discount: '50% off ($15 max) x 2', referrer: '$10 x 2 + $10 x 2', tz: 'Australia/Perth' },
+    { name: 'Adelaide',               cityId: 61040100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Adelaide' },
+    { name: 'Ballarat',              cityId: 61020100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Melbourne' },
+    { name: 'Bendigo',               cityId: 61020200, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Melbourne' },
+    { name: 'Brisbane',              cityId: 61030100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Brisbane' },
+    { name: 'Bundaberg - Hervey Bay', cityId: 61031900, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Brisbane' },
+    { name: 'Bunbury - Busselton',   cityId: 61050100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Perth' },
+    { name: 'Cairns',                cityId: 61030600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Brisbane' },
+    { name: 'Canberra',              cityId: 61080100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Sydney' },
+    { name: 'Central Coast',         cityId: 61010200, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Sydney' },
+    { name: 'Coffs Harbour',         cityId: 61010400, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Sydney' },
+    { name: 'Geelong',               cityId: 61020300, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Melbourne' },
+    { name: 'Mackay',                cityId: 61031200, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Brisbane' },
+    { name: 'Melbourne',             cityId: 61020600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Melbourne' },
+    { name: 'Port Macquarie',        cityId: 61010800, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Sydney' },
+    { name: 'Rockhampton - Gladstone', cityId: 61030800, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Brisbane' },
+    { name: 'Shepparton - Mooroopna', cityId: 61021600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Melbourne' },
+    { name: 'Sunshine Coast',        cityId: 61031600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Brisbane' },
+    { name: 'Sydney',                cityId: 61011500, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Sydney' },
+    { name: 'Toowoomba',             cityId: 61031700, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Brisbane' },
+    { name: 'Townsville',            cityId: 61031800, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Brisbane' },
+    { name: 'Wagga Wagga',           cityId: 61011300, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Sydney' },
+    { name: 'Wollongong',            cityId: 61010700, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5', tz: 'Australia/Sydney' },
   ]},
 ];
 
@@ -722,7 +722,19 @@ function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function parseRewardTimeUtc(str) {
+function tzOffsetMs(tz) {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+  }).formatToParts(now);
+  const get = type => Number(parts.find(p => p.type === type).value);
+  let h = get('hour'); if (h === 24) h = 0;
+  const localMs = Date.UTC(get('year'), get('month') - 1, get('day'), h, get('minute'), get('second'));
+  return localMs - now.getTime();
+}
+
+function parseRewardTimeMs(str, tz) {
   if (!str) return null;
   const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4}),?\s*(\d{1,2}):(\d{2}):(\d{2})\s*(am|pm)$/i);
   if (!m) return null;
@@ -730,16 +742,15 @@ function parseRewardTimeUtc(str) {
   h = Number(h);
   if (ap.toLowerCase() === 'pm' && h !== 12) h += 12;
   if (ap.toLowerCase() === 'am' && h === 12) h = 0;
-  return Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd), h, Number(min), Number(sec));
+  const asUtcMs = Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd), h, Number(min), Number(sec));
+  if (!tz) return asUtcMs;
+  return asUtcMs - tzOffsetMs(tz);
 }
 
-function isRecentClaim(rewardTimeStr) {
-  const utcMs = parseRewardTimeUtc(rewardTimeStr);
-  if (utcMs == null) return true;
-  const diffHours = (utcMs - Date.now()) / 3600000;
-  const nearestHalf = Math.round(diffHours * 2) / 2;
-  const residualMin = Math.abs(diffHours - nearestHalf) * 60;
-  return nearestHalf >= -12 && nearestHalf <= 14 && residualMin < 5;
+function isRecentClaim(rewardTimeStr, tz) {
+  const claimUtcMs = parseRewardTimeMs(rewardTimeStr, tz);
+  if (claimUtcMs == null) return true;
+  return Math.abs(Date.now() - claimUtcMs) < 5 * 60 * 1000;
 }
 
 $('claimBtn').addEventListener('click', async () => {
@@ -749,6 +760,8 @@ $('claimBtn').addEventListener('click', async () => {
   const callingCode = $('countryCallingCode').value.trim();
   const actType = Number($('activityType').value);
   const tcIds = $('tcIdList').value.split(',').map(s => Number(s.trim())).filter(Boolean);
+  const selectedCity = cityIndex[$('citySelect').value];
+  const cityTz = selectedCity?.tz || null;
 
   $('claimBtn').disabled = true;
   $('resultCard').classList.remove('show');
@@ -892,7 +905,7 @@ $('claimBtn').addEventListener('click', async () => {
 
     let alreadyClaimed = false;
     if (joinOk && hasRewards) {
-      alreadyClaimed = !isRecentClaim(rewards[0].reward_get_time);
+      alreadyClaimed = !isRecentClaim(rewards[0].reward_get_time, cityTz);
     }
 
     let level, statusText;
