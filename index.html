@@ -347,6 +347,35 @@
   }
 
   .raw-json.show { display: block; }
+
+  .city-info {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    font-size: 0.82rem;
+  }
+
+  .city-info .info-piece {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .city-info .info-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .city-info .info-val {
+    font-weight: 600;
+    color: var(--text);
+  }
 </style>
 </head>
 <body>
@@ -382,20 +411,44 @@
           </div>
         </div>
         <div class="field-group">
-          <label>Activity ID</label>
-          <input type="text" id="activityId" value="102602022">
+          <label>Country</label>
+          <select id="countrySelect"></select>
+          <div class="city-info" id="cityInfoDiscount" style="display:none;">
+            <div class="info-piece">
+              <span class="info-label">Referee gets</span>
+              <span class="info-val" id="cityDiscount"></span>
+            </div>
+          </div>
         </div>
         <div class="field-group">
-          <label>Activity Type</label>
-          <input type="number" id="activityType" value="26">
+          <label>City</label>
+          <select id="citySelect"></select>
+          <div class="city-info" id="cityInfoReferrer" style="display:none;">
+            <div class="info-piece">
+              <span class="info-label">Referrer gets</span>
+              <span class="info-val" id="cityReferrer"></span>
+            </div>
+          </div>
         </div>
-        <div class="field-group">
-          <label>City ID</label>
-          <input type="number" id="cityId" value="61050200">
-        </div>
-        <div class="field-group">
-          <label>County ID</label>
-          <input type="number" id="countyId" value="61020608">
+        <div class="field-group manual-only" id="manualFields" style="display:none;grid-column:1/-1;">
+          <div class="field-grid">
+            <div class="field-group">
+              <label>Activity ID</label>
+              <input type="text" id="activityId" value="102602022">
+            </div>
+            <div class="field-group">
+              <label>Activity Type</label>
+              <input type="number" id="activityType" value="26">
+            </div>
+            <div class="field-group">
+              <label>City ID</label>
+              <input type="number" id="cityId" value="61050200">
+            </div>
+            <div class="field-group">
+              <label>County ID</label>
+              <input type="number" id="countyId" value="0">
+            </div>
+          </div>
         </div>
         <div class="field-group">
           <label>Country Code</label>
@@ -430,9 +483,171 @@ const BASE = 'https://growth.didiglobal.com/litchi2/api';
 
 const $ = (id) => document.getElementById(id);
 
+const CITIES = [
+  { country: 'AU', countryName: 'Australia', cities: [
+    { name: 'Gold Coast',            cityId: 61030900, countyId: 0, activityId: '102602020', activityType: 26, discount: '50% off ($15 max) x 2', referrer: '$20 + $20' },
+    { name: 'Newcastle',             cityId: 61011100, countyId: 0, activityId: '102602020', activityType: 26, discount: '50% off ($15 max) x 2', referrer: '$20 + $20' },
+    { name: 'Perth',                 cityId: 61050200, countyId: 0, activityId: '102602022', activityType: 26, discount: '50% off ($15 max) x 2', referrer: '$20 + $20' },
+    { name: 'Adelaide',               cityId: 61040100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Ballarat',              cityId: 61020100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Bendigo',               cityId: 61020200, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Brisbane',              cityId: 61030100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Bundaberg - Hervey Bay', cityId: 61031900, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Bunbury - Busselton',   cityId: 61050100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Cairns',                cityId: 61030600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Canberra',              cityId: 61080100, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Central Coast',         cityId: 61010200, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Coffs Harbour',         cityId: 61010400, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Geelong',               cityId: 61020300, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Mackay',                cityId: 61031200, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Melbourne',             cityId: 61020600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Port Macquarie',        cityId: 61010800, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Rockhampton - Gladstone', cityId: 61030800, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Shepparton - Mooroopna', cityId: 61021600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Sunshine Coast',        cityId: 61031600, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Sydney',                cityId: 61011500, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Toowoomba',             cityId: 61031700, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Townsville',            cityId: 61031800, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Wagga Wagga',           cityId: 61011300, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+    { name: 'Wollongong',            cityId: 61010700, countyId: 0, activityId: '102602021', activityType: 26, discount: '$5 off x 4',             referrer: '$5 + $5' },
+  ]},
+];
+
+function buildCityIndex() {
+  const idx = {};
+  CITIES.forEach(group => {
+    group.cities.forEach(c => {
+      idx[group.country + ':' + c.cityId] = { ...c, country: group.country };
+    });
+  });
+  return idx;
+}
+const cityIndex = buildCityIndex();
+
+function populateCountrySelect() {
+  const sel = $('countrySelect');
+  const blank = document.createElement('option');
+  blank.value = '';
+  blank.textContent = '';
+  blank.hidden = true;
+  sel.appendChild(blank);
+  CITIES.forEach(group => {
+    const opt = document.createElement('option');
+    opt.value = group.country;
+    opt.textContent = group.countryName;
+    sel.appendChild(opt);
+  });
+}
+populateCountrySelect();
+
+function populateCitySelect(countryCode) {
+  const sel = $('citySelect');
+  sel.innerHTML = '';
+  const group = CITIES.find(g => g.country === countryCode);
+  if (group) {
+    const tiers = {};
+    group.cities.forEach(c => {
+      (tiers[c.discount] ||= []).push(c);
+    });
+    for (const [discount, cities] of Object.entries(tiers)) {
+      const og = document.createElement('optgroup');
+      og.label = discount;
+      cities.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = group.country + ':' + c.cityId;
+        opt.textContent = c.name;
+        og.appendChild(opt);
+      });
+      sel.appendChild(og);
+    }
+  }
+  const manual = document.createElement('option');
+  manual.value = '_manual';
+  manual.textContent = 'Manual Entry';
+  sel.appendChild(manual);
+}
+
+function applyCitySelection() {
+  const val = $('citySelect').value;
+  const isManual = val === '_manual';
+  $('manualFields').style.display = isManual ? '' : 'none';
+  if (isManual) {
+    $('cityInfoDiscount').style.display = 'none';
+    $('cityInfoReferrer').style.display = 'none';
+    return;
+  }
+  const city = cityIndex[val];
+  if (!city) return;
+  $('cityId').value = city.cityId;
+  $('countyId').value = city.countyId;
+  $('activityId').value = city.activityId;
+  $('activityType').value = city.activityType;
+  $('countryCode').value = city.country;
+  $('cityDiscount').textContent = city.discount;
+  $('cityReferrer').textContent = city.referrer;
+  $('cityInfoDiscount').style.display = '';
+  $('cityInfoReferrer').style.display = '';
+}
+
+$('countrySelect').addEventListener('change', () => {
+  populateCitySelect($('countrySelect').value);
+  applyCitySelection();
+});
+
+$('countrySelect').value = 'AU';
+populateCitySelect('AU');
+$('citySelect').value = 'AU:61050200';
+applyCitySelection();
+
+$('citySelect').addEventListener('change', applyCitySelection);
+
+function syncCityFromFields() {
+  const activityId = $('activityId').value.trim();
+  const activityType = Number($('activityType').value);
+  const cityId = Number($('cityId').value);
+  const countyId = Number($('countyId').value);
+  const countryCode = $('countryCode').value.trim();
+
+  for (const [key, city] of Object.entries(cityIndex)) {
+    if (city.cityId === cityId && city.countyId === countyId &&
+        city.activityId === activityId && city.activityType === activityType &&
+        city.country === countryCode) {
+      $('countrySelect').value = city.country;
+      populateCitySelect(city.country);
+      $('citySelect').value = key;
+      applyCitySelection();
+      return;
+    }
+  }
+  const knownCountry = CITIES.find(g => g.country === countryCode);
+  if (knownCountry) {
+    $('countrySelect').value = countryCode;
+    populateCitySelect(countryCode);
+  } else {
+    $('countrySelect').value = '';
+    $('citySelect').innerHTML = '';
+    const manual = document.createElement('option');
+    manual.value = '_manual';
+    manual.textContent = 'Manual Entry';
+    $('citySelect').appendChild(manual);
+  }
+  $('citySelect').value = '_manual';
+  applyCitySelection();
+}
+
+['activityId', 'activityType', 'cityId', 'countyId', 'countryCode'].forEach(id => {
+  $(id).addEventListener('input', syncCityFromFields);
+});
+
+if (localStorage.getItem('advancedOpen') === 'true') {
+  $('toggleBtn').classList.add('open');
+  $('advancedFields').classList.add('show');
+}
+
 $('toggleBtn').addEventListener('click', () => {
   $('toggleBtn').classList.toggle('open');
   $('advancedFields').classList.toggle('show');
+  localStorage.setItem('advancedOpen', $('advancedFields').classList.contains('show'));
 });
 
 document.querySelectorAll('#cell, #countryCallingCode').forEach(el => {
