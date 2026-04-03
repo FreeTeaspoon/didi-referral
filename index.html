@@ -243,6 +243,7 @@
   }
 
   .result-header.success { background: #ecfdf5; border-bottom: 1px solid #bbf7d0; }
+  .result-header.warning { background: #fffbeb; border-bottom: 1px solid #fde68a; }
   .result-header.error { background: #fef2f2; border-bottom: 1px solid #fecaca; }
 
   .badge {
@@ -254,6 +255,7 @@
   }
 
   .badge.success { background: var(--green); color: #fff; }
+  .badge.warning { background: #d97706; color: #fff; }
   .badge.error { background: var(--red); color: #fff; }
 
   .result-header .msg {
@@ -433,6 +435,12 @@ $('toggleBtn').addEventListener('click', () => {
   $('advancedFields').classList.toggle('show');
 });
 
+document.querySelectorAll('#cell, #countryCallingCode').forEach(el => {
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !$('claimBtn').disabled) $('claimBtn').click();
+  });
+});
+
 function getCommon(uid) {
   const activityId = $('activityId').value.trim();
   return {
@@ -473,17 +481,20 @@ function setStep(id, state) {
   el.className = 'step ' + state;
 }
 
-function showResult(success, message, bodyHtml, rawData) {
+function showResult(level, message, bodyHtml, rawData) {
   const card = $('resultCard');
   const header = $('resultHeader');
   const badge = $('resultBadge');
   const msg = $('resultMsg');
   const body = $('resultBody');
 
+  const labels = { success: 'Success', warning: 'Already Claimed', error: 'Error' };
+  const cls = (level === true) ? 'success' : (level === false) ? 'error' : level;
+
   card.classList.add('show');
-  header.className = 'result-header ' + (success ? 'success' : 'error');
-  badge.className = 'badge ' + (success ? 'success' : 'error');
-  badge.textContent = success ? 'Success' : 'Error';
+  header.className = 'result-header ' + cls;
+  badge.className = 'badge ' + cls;
+  badge.textContent = labels[cls] || cls;
   msg.textContent = message;
 
   const rawId = 'raw_' + Date.now();
@@ -494,6 +505,17 @@ function showResult(success, message, bodyHtml, rawData) {
 
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function parseRewardTime(str) {
+  if (!str) return null;
+  const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4}),?\s*(\d{1,2}):(\d{2}):(\d{2})\s*(am|pm)$/i);
+  if (!m) return null;
+  let [, dd, mm, yyyy, h, min, sec, ap] = m;
+  h = Number(h);
+  if (ap.toLowerCase() === 'pm' && h !== 12) h += 12;
+  if (ap.toLowerCase() === 'am' && h === 12) h = 0;
+  return new Date(Number(yyyy), Number(mm) - 1, Number(dd), h, Number(min), Number(sec));
 }
 
 $('claimBtn').addEventListener('click', async () => {
@@ -549,7 +571,7 @@ $('claimBtn').addEventListener('click', async () => {
       });
       allResponses['join_attempt_' + attempt] = joinRes;
 
-      if (joinRes.business_code === 'USER_RISK_FORBIDDEN' && attempt < MAX_RETRIES) {
+      if (joinRes.business_code === 'USER_RISK_FORBIDDEN' && attempt <= MAX_RETRIES) {
         if (attempt < uidList.length) {
           currentUid = uidList[attempt];
         } else if (useRandomFallback) {
@@ -645,14 +667,36 @@ $('claimBtn').addEventListener('click', async () => {
 
     const joinOk = joinRes.business_code === 'SUCCESS' || joinRes.business_code === 'UNDEFINED';
     const hasRewards = rewards.length > 0;
-    const isSuccess = joinOk && hasRewards;
-    const statusText = !joinOk
-      ? joinRes.business_code || 'Unknown error'
-      : hasRewards ? 'Referral claimed' : 'No rewards returned';
 
-    if (!joinOk) setStep('step2', 'fail');
-    if (!hasRewards) setStep('step3', 'fail');
-    showResult(isSuccess, statusText, html, allResponses);
+    let alreadyClaimed = false;
+    if (joinOk && hasRewards) {
+      const claimedTime = parseRewardTime(rewards[0].reward_get_time);
+      if (claimedTime) {
+        const diffMs = Math.abs(Date.now() - claimedTime.getTime());
+        if (diffMs > 2 * 60 * 1000) alreadyClaimed = true;
+      }
+      const respUid = joinData.referee_uid;
+      if (respUid && String(respUid) !== String(currentUid)) alreadyClaimed = true;
+    }
+
+    let level, statusText;
+    if (!joinOk) {
+      level = false;
+      statusText = joinRes.business_code || 'Unknown error';
+      setStep('step2', 'fail');
+    } else if (!hasRewards) {
+      level = false;
+      statusText = 'No rewards returned';
+      setStep('step3', 'fail');
+    } else if (alreadyClaimed) {
+      level = 'warning';
+      statusText = 'Referral was already claimed';
+    } else {
+      level = true;
+      statusText = 'Referral claimed';
+    }
+
+    showResult(level, statusText, html, allResponses);
 
   } catch (err) {
     ['step1','step2','step3'].forEach(s => {
