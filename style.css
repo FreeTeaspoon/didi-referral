@@ -350,7 +350,7 @@ select:focus {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  margin-top: 20px;
+  margin-top: 16px;
   display: none;
   box-shadow: var(--shadow);
 }
@@ -360,10 +360,10 @@ select:focus {
 }
 
 .result-header {
-  padding: 20px 24px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .result-header.success {
@@ -380,9 +380,9 @@ select:focus {
 }
 
 .badge {
-  padding: 5px 14px;
+  padding: 4px 12px;
   border-radius: var(--radius-pill);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -402,19 +402,19 @@ select:focus {
 }
 
 .result-header .msg {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
 }
 
 .result-body {
-  padding: 24px;
+  padding: 12px 16px 16px;
 }
 
 .reward-item {
-  padding: 18px;
+  padding: 12px 16px;
   background: var(--surface2);
   border-radius: var(--radius);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .reward-item:last-child {
@@ -425,7 +425,7 @@ select:focus {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 6px;
+  margin-bottom: 3px;
 }
 
 .reward-row:last-child {
@@ -433,52 +433,55 @@ select:focus {
 }
 
 .reward-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-dim);
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 
 .reward-value {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 500;
   text-align: right;
 }
 
 .reward-value.highlight {
   color: var(--accent);
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
 }
 
 .join-info {
-  padding: 18px;
+  padding: 12px 16px;
   background: var(--surface2);
   border-radius: var(--radius);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .join-info .info-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
-  margin-bottom: 4px;
+  font-size: 0.82rem;
+  margin-bottom: 2px;
 }
 
 .join-info .info-row:last-child {
   margin-bottom: 0;
 }
 .join-info .info-label {
+  font-size: 0.7rem;
   color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .raw-toggle {
   background: none;
   border: none;
   color: var(--text-dim);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   cursor: pointer;
-  padding: 12px 0 0;
+  padding: 8px 0 0;
   text-decoration: none;
   transition: color 0.2s;
 }
@@ -489,12 +492,12 @@ select:focus {
 
 .raw-json {
   display: none;
-  margin-top: 12px;
+  margin-top: 8px;
   background: var(--bg);
   border-radius: var(--radius);
-  padding: 18px;
+  padding: 14px;
   font-family: 'Cascadia Code', 'Fira Code', monospace;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-dim);
   max-height: 300px;
   overflow: auto;
@@ -538,18 +541,18 @@ select:focus {
 
 @media (max-width: 480px) {
   body {
-    padding: 32px 20px;
+    padding: 32px 16px;
   }
   .card {
-    padding: 24px;
+    padding: 14px 16px;
   }
   .result-body {
-    padding: 20px;
+    padding: 12px;
   }
   .result-header {
-    padding: 18px 20px;
+    padding: 12px 16px;
   }
   .field-grid {
-    gap: 12px;
+    gap: 10px;
   }
 }
