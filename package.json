@@ -1,0 +1,19 @@
+{
+  "name": "didi-referral",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser tool for claiming DiDi referral discounts via the Growth API",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "eslint": "^9",
+    "prettier": "^3",
+    "@eslint/js": "^9",
+    "globals": "^16"
+  }
+}
