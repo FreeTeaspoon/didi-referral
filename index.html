@@ -650,7 +650,7 @@ $('toggleBtn').addEventListener('click', () => {
   localStorage.setItem('advancedOpen', $('advancedFields').classList.contains('show'));
 });
 
-document.querySelectorAll('#cell, #countryCallingCode').forEach(el => {
+document.querySelectorAll('.card input, .card select').forEach(el => {
   el.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !$('claimBtn').disabled) $('claimBtn').click();
   });
@@ -722,7 +722,7 @@ function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function parseRewardTime(str) {
+function parseRewardTimeUtc(str) {
   if (!str) return null;
   const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4}),?\s*(\d{1,2}):(\d{2}):(\d{2})\s*(am|pm)$/i);
   if (!m) return null;
@@ -730,8 +730,16 @@ function parseRewardTime(str) {
   h = Number(h);
   if (ap.toLowerCase() === 'pm' && h !== 12) h += 12;
   if (ap.toLowerCase() === 'am' && h === 12) h = 0;
-  const utcMs = Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd), h, Number(min), Number(sec));
-  return new Date(utcMs - 8 * 60 * 60 * 1000);
+  return Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd), h, Number(min), Number(sec));
+}
+
+function isRecentClaim(rewardTimeStr) {
+  const utcMs = parseRewardTimeUtc(rewardTimeStr);
+  if (utcMs == null) return true;
+  const diffHours = (utcMs - Date.now()) / 3600000;
+  const nearestHalf = Math.round(diffHours * 2) / 2;
+  const residualMin = Math.abs(diffHours - nearestHalf) * 60;
+  return nearestHalf >= -12 && nearestHalf <= 14 && residualMin < 5;
 }
 
 $('claimBtn').addEventListener('click', async () => {
@@ -886,11 +894,7 @@ $('claimBtn').addEventListener('click', async () => {
 
     let alreadyClaimed = false;
     if (joinOk && hasRewards) {
-      const claimedTime = parseRewardTime(rewards[0].reward_get_time);
-      if (claimedTime) {
-        const diffMs = Math.abs(Date.now() - claimedTime.getTime());
-        if (diffMs > 2 * 60 * 1000) alreadyClaimed = true;
-      }
+      alreadyClaimed = !isRecentClaim(rewards[0].reward_get_time);
     }
 
     let level, statusText;
