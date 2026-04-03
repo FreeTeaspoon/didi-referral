@@ -136,6 +136,38 @@
 
   .field-group { margin-bottom: 0; }
 
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    margin-bottom: 4px;
+  }
+
+  .checkbox-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .checkbox-group label {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-bottom: 0;
+    cursor: pointer;
+  }
+
+  .field-hint {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
   .btn {
     width: 100%;
     padding: 14px;
@@ -339,8 +371,13 @@
     <div class="advanced-fields" id="advancedFields">
       <div class="field-grid">
         <div class="field-group full">
-          <label>UID</label>
+          <label>UID(s)</label>
           <input type="text" id="uid" value="369436974820549">
+          <div class="field-hint">Comma-separated — tries each in order on retry</div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="randomUidToggle" checked>
+            <label for="randomUidToggle">Use random UIDs after exhausting the list</label>
+          </div>
         </div>
         <div class="field-group">
           <label>Activity ID</label>
@@ -396,7 +433,7 @@ $('toggleBtn').addEventListener('click', () => {
   $('advancedFields').classList.toggle('show');
 });
 
-function getCommon() {
+function getCommon(uid) {
   const activityId = $('activityId').value.trim();
   return {
     a: activityId,
@@ -404,11 +441,15 @@ function getCommon() {
     city_id: Number($('cityId').value),
     country_code: $('countryCode').value.trim(),
     county_id: Number($('countyId').value),
-    uid: Number($('uid').value),
+    uid: Number(uid),
     location_cityid: 0,
     mock: false,
     mock_by_key: false,
   };
+}
+
+function parseUidList() {
+  return $('uid').value.split(',').map(s => s.trim()).filter(Boolean);
 }
 
 function randomUid() {
@@ -474,14 +515,16 @@ $('claimBtn').addEventListener('click', async () => {
   const allResponses = {};
 
   try {
-    // Steps 1+2: tc/sign then component/join (auto-retry both with random UID on USER_RISK_FORBIDDEN)
-    const MAX_RETRIES = 5;
-    let joinRes, signRes, attempt = 0;
+    const uidList = parseUidList();
+    const useRandomFallback = $('randomUidToggle').checked;
+    const MAX_RETRIES = Math.max(uidList.length, useRandomFallback ? 5 : uidList.length);
+
+    let joinRes, signRes, currentUid = uidList[0] || randomUid(), attempt = 0;
     while (true) {
       attempt++;
 
       signRes = await post('/tc/sign', {
-        ...getCommon(),
+        ...getCommon(currentUid),
         user_type: 0,
         tc_id_list: tcIds,
         cell,
@@ -498,7 +541,7 @@ $('claimBtn').addEventListener('click', async () => {
 
       setStep('step2', 'active');
       joinRes = await post('/component/join', {
-        ...getCommon(),
+        ...getCommon(currentUid),
         user_type: 1,
         cell,
         country_calling_code: callingCode,
@@ -507,10 +550,16 @@ $('claimBtn').addEventListener('click', async () => {
       allResponses['join_attempt_' + attempt] = joinRes;
 
       if (joinRes.business_code === 'USER_RISK_FORBIDDEN' && attempt < MAX_RETRIES) {
-        const newUid = randomUid();
-        $('uid').value = newUid;
+        if (attempt < uidList.length) {
+          currentUid = uidList[attempt];
+        } else if (useRandomFallback) {
+          currentUid = randomUid();
+        } else {
+          break;
+        }
+        const source = attempt < uidList.length ? 'list' : 'random';
         $('step2').querySelector('.dot').nextSibling.textContent =
-          ` Joining referral... (retry ${attempt}/${MAX_RETRIES}, new UID: ${newUid})`;
+          ` Joining referral... (retry ${attempt}/${MAX_RETRIES}, ${source} UID: ${currentUid})`;
         continue;
       }
       break;
@@ -526,12 +575,12 @@ $('claimBtn').addEventListener('click', async () => {
     setStep('step2', 'done');
 
     const joinData = joinRes.data || {};
-    const refereeUid = joinData.referee_uid || Number($('uid').value);
+    const refereeUid = joinData.referee_uid || Number(currentUid);
 
     // Step 3: referral_component
     setStep('step3', 'active');
     const rewardBody = {
-      ...getCommon(),
+      ...getCommon(currentUid),
       uid: refereeUid,
       user_type: 0,
       component_package_list: ['pkg_reward_list'],
