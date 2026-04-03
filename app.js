@@ -14,12 +14,6 @@ function buildCityIndex() {
 }
 const cityIndex = buildCityIndex();
 
-function createManualOption() {
-  const opt = document.createElement('option');
-  opt.value = '_manual';
-  opt.textContent = 'Manual Entry';
-  return opt;
-}
 
 function populateCountrySelect() {
   const sel = $('countrySelect');
@@ -58,18 +52,10 @@ function populateCitySelect(countryCode) {
       sel.appendChild(og);
     }
   }
-  sel.appendChild(createManualOption());
 }
 
 function applyCitySelection() {
   const val = $('citySelect').value;
-  const isManual = val === '_manual';
-  $('manualFields').style.display = isManual ? '' : 'none';
-  if (isManual) {
-    $('cityInfoDiscount').style.display = 'none';
-    $('cityInfoReferrer').style.display = 'none';
-    return;
-  }
   const city = cityIndex[val];
   if (!city) return;
   $('cityId').value = city.cityId;
@@ -95,65 +81,16 @@ applyCitySelection();
 
 $('citySelect').addEventListener('change', applyCitySelection);
 
-function syncCityFromFields() {
-  const activityId = $('activityId').value.trim();
-  const activityType = Number($('activityType').value);
-  const cityId = Number($('cityId').value);
-  const countyId = Number($('countyId').value);
-  const countryCode = $('countryCode').value.trim();
-
-  for (const [key, city] of Object.entries(cityIndex)) {
-    if (
-      city.cityId === cityId &&
-      city.countyId === countyId &&
-      city.activityId === activityId &&
-      city.activityType === activityType &&
-      city.country === countryCode
-    ) {
-      $('countrySelect').value = city.country;
-      populateCitySelect(city.country);
-      $('citySelect').value = key;
-      applyCitySelection();
-      return;
-    }
-  }
-  const knownCountry = CITIES.find((g) => g.country === countryCode);
-  if (knownCountry) {
-    $('countrySelect').value = countryCode;
-    populateCitySelect(countryCode);
-  } else {
-    $('countrySelect').value = '';
-    $('citySelect').innerHTML = '';
-    $('citySelect').appendChild(createManualOption());
-  }
-  $('citySelect').value = '_manual';
-  applyCitySelection();
+function applyManualEntryToggle() {
+  const isManual = $('manualEntryToggle').checked;
+  $('countryCityCard').style.display = isManual ? 'none' : '';
+  $('manualFields').style.display = isManual ? '' : 'none';
 }
 
-['activityId', 'activityType', 'cityId', 'countyId', 'countryCode'].forEach(
-  (id) => {
-    $(id).addEventListener('input', syncCityFromFields);
-  },
-);
+$('manualEntryToggle').addEventListener('change', applyManualEntryToggle);
+applyManualEntryToggle();
 
-const toggleBtn = $('toggleBtn');
-const advancedFields = $('advancedFields');
-
-if (localStorage.getItem('advancedOpen') === 'true') {
-  toggleBtn.classList.add('open');
-  advancedFields.classList.add('show');
-  toggleBtn.setAttribute('aria-expanded', 'true');
-}
-
-toggleBtn.addEventListener('click', () => {
-  toggleBtn.classList.toggle('open');
-  advancedFields.classList.toggle('show');
-  const isOpen = advancedFields.classList.contains('show');
-  toggleBtn.setAttribute('aria-expanded', String(isOpen));
-  localStorage.setItem('advancedOpen', isOpen);
-});
-
-document.querySelectorAll('.card input, .card select').forEach((el) => {
+document.querySelectorAll('.container input, .container select').forEach((el) => {
   el.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !$('claimBtn').disabled) $('claimBtn').click();
   });
@@ -353,7 +290,7 @@ $('claimBtn').addEventListener('click', async () => {
     const useRandomFallback = $('randomUidToggle').checked;
     const MAX_RETRIES = Math.max(
       uidList.length,
-      useRandomFallback ? 5 : uidList.length,
+      useRandomFallback ? 3 : uidList.length,
     );
 
     let joinRes,

@@ -26,92 +26,80 @@
             <input type="tel" id="cell" autofocus />
           </div>
         </div>
+      </div>
 
-        <button
-          class="toggle-advanced"
-          id="toggleBtn"
-          type="button"
-          aria-expanded="false"
-          aria-controls="advancedFields"
-        >
-          <span class="arrow">&#9654;</span> Advanced Settings
-        </button>
+      <div class="card">
+        <div class="field-grid">
+          <div class="field-group">
+            <label>UID(s)</label>
+            <input type="text" id="uid" value="369436974820549" />
+          </div>
+          <div class="field-group">
+            <label>TC ID List</label>
+            <input type="text" id="tcIdList" value="2602" />
+          </div>
+        </div>
 
-        <div class="advanced-fields" id="advancedFields">
-          <div class="field-grid">
-            <div class="field-group full">
-              <label>UID(s)</label>
-              <input type="text" id="uid" value="369436974820549" />
-              <div class="field-hint">
-                Comma-separated — tries each in order on retry
-              </div>
-              <div class="checkbox-group">
-                <input type="checkbox" id="randomUidToggle" checked />
-                <label for="randomUidToggle"
-                  >Use random UIDs after exhausting the list</label
-                >
-              </div>
-            </div>
-            <div class="field-group">
-              <label>Country</label>
-              <select id="countrySelect"></select>
-              <div
-                class="city-info"
-                id="cityInfoDiscount"
-                style="display: none"
-              >
-                <div class="info-piece">
-                  <span class="info-label">Referee gets</span>
-                  <span class="info-val" id="cityDiscount"></span>
-                </div>
+        <div class="toggles-row">
+          <div class="toggle-group">
+            <label for="randomUidToggle">Random UIDs</label>
+            <input type="checkbox" id="randomUidToggle" class="toggle-input" checked />
+            <label for="randomUidToggle" class="toggle-switch"><span class="toggle-knob"></span></label>
+          </div>
+          <div class="toggle-group">
+            <label for="manualEntryToggle">Manual Entry</label>
+            <input type="checkbox" id="manualEntryToggle" class="toggle-input" />
+            <label for="manualEntryToggle" class="toggle-switch"><span class="toggle-knob"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="countryCityCard">
+        <div class="field-grid">
+          <div class="field-group">
+            <label>Country</label>
+            <select id="countrySelect"></select>
+            <div class="city-info" id="cityInfoDiscount" style="display: none">
+              <div class="info-piece">
+                <span class="info-label">Referee gets</span>
+                <span class="info-val" id="cityDiscount"></span>
               </div>
             </div>
-            <div class="field-group">
-              <label>City</label>
-              <select id="citySelect"></select>
-              <div
-                class="city-info"
-                id="cityInfoReferrer"
-                style="display: none"
-              >
-                <div class="info-piece">
-                  <span class="info-label">Referrer gets</span>
-                  <span class="info-val" id="cityReferrer"></span>
-                </div>
+          </div>
+          <div class="field-group">
+            <label>City</label>
+            <select id="citySelect"></select>
+            <div class="city-info" id="cityInfoReferrer" style="display: none">
+              <div class="info-piece">
+                <span class="info-label">Referrer gets</span>
+                <span class="info-val" id="cityReferrer"></span>
               </div>
             </div>
-            <div
-              class="field-group manual-only"
-              id="manualFields"
-              style="display: none; grid-column: 1/-1"
-            >
-              <div class="field-grid">
-                <div class="field-group">
-                  <label>Activity ID</label>
-                  <input type="text" id="activityId" value="102602022" />
-                </div>
-                <div class="field-group">
-                  <label>Activity Type</label>
-                  <input type="number" id="activityType" value="26" />
-                </div>
-                <div class="field-group">
-                  <label>City ID</label>
-                  <input type="number" id="cityId" value="61050200" />
-                </div>
-                <div class="field-group">
-                  <label>County ID</label>
-                  <input type="number" id="countyId" value="0" />
-                </div>
-              </div>
-            </div>
-            <div class="field-group">
-              <label>Country Code</label>
-              <input type="text" id="countryCode" value="AU" />
-            </div>
-            <div class="field-group">
-              <label>TC ID List (comma-sep)</label>
-              <input type="text" id="tcIdList" value="2602" />
-            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="manualFields" style="display: none">
+        <div class="field-grid">
+          <div class="field-group">
+            <label>Activity ID</label>
+            <input type="text" id="activityId" value="102602022" />
+          </div>
+          <div class="field-group">
+            <label>Activity Type</label>
+            <input type="number" id="activityType" value="26" />
+          </div>
+          <div class="field-group">
+            <label>City ID</label>
+            <input type="number" id="cityId" value="61050200" />
+          </div>
+          <div class="field-group">
+            <label>County ID</label>
+            <input type="number" id="countyId" value="0" />
+          </div>
+          <div class="field-group">
+            <label>Country Code</label>
+            <input type="text" id="countryCode" value="AU" />
           </div>
         </div>
       </div>

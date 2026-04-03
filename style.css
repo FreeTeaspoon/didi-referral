@@ -112,8 +112,8 @@ h1 span {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 24px;
-  margin-bottom: 20px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
   box-shadow: var(--shadow);
 }
 
@@ -161,41 +161,6 @@ select:focus {
   flex: 1;
 }
 
-.toggle-advanced {
-  background: none;
-  border: none;
-  color: var(--text-dim);
-  font-size: 0.82rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 12px 0;
-  transition: color 0.2s;
-}
-
-.toggle-advanced:hover {
-  color: var(--text);
-}
-
-.toggle-advanced .arrow {
-  display: inline-block;
-  transition: transform 0.2s;
-  font-size: 0.7rem;
-}
-
-.toggle-advanced.open .arrow {
-  transform: rotate(90deg);
-}
-
-.advanced-fields {
-  display: none;
-  padding-top: 16px;
-}
-
-.advanced-fields.show {
-  display: block;
-}
 
 .field-grid {
   display: grid;
@@ -211,23 +176,19 @@ select:focus {
   margin-bottom: 0;
 }
 
-.checkbox-group {
+.toggles-row {
+  display: flex;
+  gap: 24px;
+  margin-top: 14px;
+}
+
+.toggle-group {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  margin-bottom: 4px;
+  gap: 10px;
 }
 
-.checkbox-group input[type='checkbox'] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--accent);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.checkbox-group label {
+.toggle-group > label:first-child {
   font-size: 0.82rem;
   font-weight: 500;
   color: var(--text);
@@ -237,11 +198,48 @@ select:focus {
   cursor: pointer;
 }
 
+.toggle-input {
+  display: none;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-input:checked + .toggle-switch {
+  background: var(--accent);
+}
+
+.toggle-input:checked + .toggle-switch .toggle-knob {
+  transform: translateX(18px);
+}
+
 .field-hint {
   font-size: 0.75rem;
   color: var(--text-dim);
   margin-top: 4px;
 }
+
 
 .btn {
   width: 100%;
