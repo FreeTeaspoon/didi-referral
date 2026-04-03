@@ -755,7 +755,7 @@ $('claimBtn').addEventListener('click', async () => {
   $('progress').style.display = 'block';
   $('step2').querySelector('.dot').nextSibling.textContent = ' Joining referral...';
   $('step3').querySelector('.dot').nextSibling.textContent = ' Fetching rewards...';
-  setStep('step2', '');
+  setStep('step2', 'active');
   setStep('step3', '');
 
   const allResponses = {};
@@ -784,8 +784,6 @@ $('claimBtn').addEventListener('click', async () => {
         showResult(false, signRes.errmsg || 'T&C sign failed', '', allResponses);
         return;
       }
-
-      setStep('step2', 'active');
       joinRes = await post('/component/join', {
         ...getCommon(currentUid),
         user_type: 1,
