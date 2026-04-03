@@ -515,7 +515,8 @@ function parseRewardTime(str) {
   h = Number(h);
   if (ap.toLowerCase() === 'pm' && h !== 12) h += 12;
   if (ap.toLowerCase() === 'am' && h === 12) h = 0;
-  return new Date(Number(yyyy), Number(mm) - 1, Number(dd), h, Number(min), Number(sec));
+  const utcMs = Date.UTC(Number(yyyy), Number(mm) - 1, Number(dd), h, Number(min), Number(sec));
+  return new Date(utcMs - 8 * 60 * 60 * 1000);
 }
 
 $('claimBtn').addEventListener('click', async () => {
@@ -618,13 +619,13 @@ $('claimBtn').addEventListener('click', async () => {
 
     if (rewardRes.errno !== 0) {
       setStep('step3', 'fail');
-      showResult(false, rewardRes.errmsg || 'Reward fetch failed', buildJoinHtml(joinData, []), allResponses);
+      showResult(false, rewardRes.errmsg || 'Reward fetch failed', buildJoinHtml(joinData, [], currentUid), allResponses);
       return;
     }
     setStep('step3', 'done');
 
     const rewards = rewardRes.data?.pkg_reward_list?.com_reward_list?.data?.reward_list || [];
-    let html = buildJoinHtml(joinData, rewards);
+    let html = buildJoinHtml(joinData, rewards, currentUid);
 
     if (rewards.length === 0) {
       html += '<div class="reward-item"><div class="reward-row"><span class="reward-label">Info</span><span class="reward-value">No rewards returned</span></div></div>';
@@ -675,8 +676,6 @@ $('claimBtn').addEventListener('click', async () => {
         const diffMs = Math.abs(Date.now() - claimedTime.getTime());
         if (diffMs > 2 * 60 * 1000) alreadyClaimed = true;
       }
-      const respUid = joinData.referee_uid;
-      if (respUid && String(respUid) !== String(currentUid)) alreadyClaimed = true;
     }
 
     let level, statusText;
@@ -708,13 +707,14 @@ $('claimBtn').addEventListener('click', async () => {
   }
 });
 
-function buildJoinHtml(joinData, rewards) {
+function buildJoinHtml(joinData, rewards, referrerUid) {
   if (!joinData || Object.keys(joinData).length === 0) return '';
-  const refereeView = rewards?.[0]?.reward_referees?.[0]?.referee_view;
+  const referrerView = rewards?.[0]?.reward_referees?.[0]?.referee_view;
   const rows = [
     ['Assist Status', joinData.assist_status],
+    ['Referrer UID', referrerUid],
+    ['Referrer', referrerView],
     ['Referee UID', joinData.referee_uid],
-    ['Referee', refereeView],
   ].filter(([, v]) => v != null);
 
   if (rows.length === 0) return '';
