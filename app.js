@@ -197,10 +197,16 @@ async function postOtp(url, body, extraHeaders = {}) {
       body: JSON.stringify(body),
       signal: controller.signal,
     });
+    const json = await res.json().catch(() => null);
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      const msg =
+        json?.errmsg || json?.message || `HTTP ${res.status}: ${res.statusText}`;
+      const err = new Error(msg);
+      err.status = res.status;
+      err.body = json;
+      throw err;
     }
-    return await res.json();
+    return json;
   } catch (err) {
     if (err.name === 'AbortError') {
       throw new Error('Request timed out');
@@ -285,16 +291,22 @@ $('sendCodeBtn').addEventListener('click', async () => {
     if (res.errno !== 0) {
       btn.textContent = 'Send Code';
       btn.disabled = false;
-      alert(res.errmsg || 'Failed to send SMS code');
+      showResult(false, res.errmsg || 'Failed to send SMS code', '', { sms: res });
       return;
     }
-    btn.textContent = 'Send Code';
-    btn.disabled = false;
+    btn.textContent = 'Sent!';
+    btn.disabled = true;
     $('otpCode').focus();
+    setTimeout(() => {
+      btn.textContent = 'Send Code';
+      btn.disabled = false;
+    }, 2000);
+    $('progress').style.display = 'none';
+    showResult(true, 'SMS sent', '', { sms: res });
   } catch (err) {
     btn.textContent = 'Send Code';
     btn.disabled = false;
-    alert(err.message || 'Failed to send SMS code');
+    showResult(false, err.message || 'Failed to send SMS code', '', {});
   }
 });
 
@@ -448,10 +460,12 @@ async function claimOtp() {
     }
 
     setStep('stepOtp', 'done');
-    const coupons =
-      res.data?.reward_info?.channel_gift_package?.coupon || [];
-    const receivedMsg =
-      res.data?.reward_info?.channel_gift_package?.received_msg || '';
+    const freshPkg = res.data?.reward_info?.channel_gift_package;
+    const historyPkg = res.data?.reward_history_list?.channel_gift_package;
+    const alreadyClaimed = !freshPkg && !!historyPkg;
+    const pkg = freshPkg || historyPkg;
+    const coupons = pkg?.coupon || [];
+    const receivedMsg = pkg?.received_msg || '';
     let html = '';
     if (receivedMsg) {
       html += `<div class="join-info"><div class="info-row"><span>${escHtml(receivedMsg)}</span></div></div>`;
@@ -489,8 +503,14 @@ async function claimOtp() {
           </div>`;
       });
     }
-    showResult(true, 'Gift package claimed', html, allResponses);
+    showResult(
+      alreadyClaimed ? 'warning' : true,
+      alreadyClaimed ? 'Already claimed' : 'Gift package claimed',
+      html,
+      allResponses,
+    );
   } catch (err) {
+    if (err.body) allResponses.errorBody = err.body;
     setStep('stepOtp', 'fail');
     showResult(false, err.message || 'Network error', '', allResponses);
   } finally {

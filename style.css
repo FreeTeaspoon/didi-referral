@@ -163,6 +163,7 @@ select:focus {
 
 .otp-row {
   display: flex;
+  align-items: stretch;
   gap: 10px;
 }
 
@@ -170,9 +171,13 @@ select:focus {
   flex: 1;
 }
 
+.otp-row .otp-field input {
+  height: 100%;
+}
+
 .btn-send {
   flex: 0 0 120px;
-  padding: 12px 8px;
+  padding: 0 8px;
   font-size: 0.85rem;
   letter-spacing: 0;
 }
