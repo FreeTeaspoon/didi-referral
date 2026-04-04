@@ -161,6 +161,28 @@ select:focus {
   flex: 1;
 }
 
+.otp-row {
+  display: flex;
+  gap: 10px;
+}
+
+.otp-row .otp-field {
+  flex: 1;
+}
+
+.btn-send {
+  flex: 0 0 120px;
+  padding: 12px 8px;
+  font-size: 0.85rem;
+  letter-spacing: 0;
+}
+
+.btn-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  background: var(--accent);
+}
 
 .field-grid {
   display: grid;

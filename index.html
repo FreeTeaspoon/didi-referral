@@ -28,7 +28,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="uidCard">
         <div class="field-grid">
           <div class="field-group">
             <label>UID(s)</label>
@@ -104,9 +104,22 @@
         </div>
       </div>
 
+      <div class="card" id="otpCard" style="display: none">
+        <label>Verification Code</label>
+        <div class="otp-row">
+          <div class="otp-field">
+            <input type="text" id="otpCode" placeholder="Enter OTP" maxlength="6" inputmode="numeric" />
+          </div>
+          <button class="btn btn-send" id="sendCodeBtn">Send Code</button>
+        </div>
+      </div>
+
       <button class="btn" id="claimBtn">Claim Discount</button>
 
       <div class="progress" id="progress" style="display: none" role="status">
+        <div class="step" id="stepOtp" style="display: none">
+          <span class="dot"></span> Sending OTP...
+        </div>
         <div class="step" id="step2">
           <span class="dot"></span> Joining referral...
         </div>

@@ -255,4 +255,27 @@ const CITIES = [
       },
     ],
   },
+  {
+    country: 'HK',
+    countryName: 'Hong Kong',
+    otp: true,
+    callingCode: '+852',
+    lang: 'zh-HK',
+    campaign: {
+      prodKey: 'ut-launch-xlp',
+      dchn: 'wO0GWwX',
+      xpsid: 'b70f0f388064416593411e99af22d1bd',
+      canvasId: '408141',
+    },
+    cities: [
+      {
+        name: 'Hong Kong',
+        cityId: 0,
+        countyId: 0,
+        discount: 'OTP Promo',
+        referrer: '-',
+        tz: 'Asia/Hong_Kong',
+      },
+    ],
+  },
 ];

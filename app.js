@@ -1,4 +1,7 @@
 const BASE = 'https://growth.didiglobal.com/litchi2/api';
+const SMS_BASE =
+  'https://gungnir.xiaojukeji.com/data-ingestion/api/rabbit_page';
+const GIFT_BASE = 'https://www.udache.com/gtapi/rosenbridge/giftpackage';
 const FETCH_TIMEOUT_MS = 15000;
 
 const $ = (id) => document.getElementById(id);
@@ -69,9 +72,22 @@ function applyCitySelection() {
   $('cityInfoReferrer').style.display = '';
 }
 
+function applyOtpModeToggle() {
+  const otp = isOtpMode();
+  const group = getSelectedCountryGroup();
+
+  $('otpCard').style.display = otp ? '' : 'none';
+  $('uidCard').style.display = otp ? 'none' : '';
+
+  if (otp && group.callingCode) {
+    $('countryCallingCode').value = group.callingCode;
+  }
+}
+
 $('countrySelect').addEventListener('change', () => {
   populateCitySelect($('countrySelect').value);
   applyCitySelection();
+  applyOtpModeToggle();
 });
 
 $('countrySelect').value = 'AU';
@@ -148,6 +164,139 @@ async function post(endpoint, body) {
     clearTimeout(timeout);
   }
 }
+
+function generateXoid() {
+  return crypto.randomUUID();
+}
+
+function getOtpTrackingParams(campaign) {
+  return {
+    xbiz: '',
+    prod_key: campaign.prodKey,
+    xpsid: campaign.xpsid,
+    dchn: campaign.dchn,
+    xoid: generateXoid(),
+    xenv: 'h5',
+    xspm_from: '',
+    xpsid_root: campaign.xpsid,
+    xpsid_from: '',
+    xpsid_share: '',
+  };
+}
+
+async function postOtp(url, body, extraHeaders = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+        ...extraHeaders,
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    return await res.json();
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('Request timed out');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function sendSmsCode(phone, callingCode, lang, campaign) {
+  const body = {
+    ...getOtpTrackingParams(campaign),
+    country_code: callingCode,
+    phone,
+    lang,
+  };
+  return postOtp(`${SMS_BASE}/send_sms_code`, body);
+}
+
+async function claimGiftPackage(phone, callingCode, otp, campaign) {
+  const body = {
+    ...getOtpTrackingParams(campaign),
+    canvas_id: campaign.canvasId,
+    query_version: 'v2',
+    country_calling_code: callingCode,
+    cell: phone,
+    verification_code: otp,
+    extra: {
+      env: {
+        dchn: campaign.dchn,
+        userAgent: navigator.userAgent,
+        fromChannel: '8',
+        newAppid: '30004',
+        isHitButton: true,
+        isOpenWeb: true,
+        timeCost: 0,
+        isPaste: false,
+        xenv: 'h5',
+      },
+    },
+    url: window.location.href,
+  };
+  return postOtp(`${GIFT_BASE}/detail?nginx_cors=false`, body, {
+    'secdd-challenge': '4|v1.1.0||||||',
+    'secdd-authentication': String(Math.floor(Date.now() / 1000)),
+  });
+}
+
+function getSelectedCountryGroup() {
+  const code = $('countrySelect').value;
+  return CITIES.find((g) => g.country === code) || null;
+}
+
+function isOtpMode() {
+  const group = getSelectedCountryGroup();
+  return group?.otp === true;
+}
+
+
+$('sendCodeBtn').addEventListener('click', async () => {
+  const cell = $('cell').value.trim();
+  if (!cell) {
+    $('cell').focus();
+    return;
+  }
+  const group = getSelectedCountryGroup();
+  if (!group?.otp) return;
+
+  const btn = $('sendCodeBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    const callingCode = $('countryCallingCode').value.trim();
+    const res = await sendSmsCode(
+      cell,
+      callingCode,
+      group.lang,
+      group.campaign,
+    );
+    if (res.errno !== 0) {
+      btn.textContent = 'Send Code';
+      btn.disabled = false;
+      alert(res.errmsg || 'Failed to send SMS code');
+      return;
+    }
+    btn.textContent = 'Send Code';
+    btn.disabled = false;
+    $('otpCode').focus();
+  } catch (err) {
+    btn.textContent = 'Send Code';
+    btn.disabled = false;
+    alert(err.message || 'Failed to send SMS code');
+  }
+});
 
 function setStep(id, state) {
   const el = $(id);
@@ -250,9 +399,109 @@ function isRecentClaim(rewardTimeStr, tz) {
 
 let isClaiming = false;
 
-$('claimBtn').addEventListener('click', async () => {
-  if (isClaiming) return;
+async function claimOtp() {
+  const cell = $('cell').value.trim();
+  const otp = $('otpCode').value.trim();
+  const group = getSelectedCountryGroup();
 
+  if (!cell) {
+    $('cell').focus();
+    return;
+  }
+  if (!otp) {
+    $('otpCode').focus();
+    return;
+  }
+
+  isClaiming = true;
+  const claimBtn = $('claimBtn');
+  claimBtn.disabled = true;
+  claimBtn.classList.add('loading');
+  claimBtn.textContent = 'Claiming...';
+
+  $('resultCard').classList.remove('show');
+  $('progress').style.display = 'block';
+  $('stepOtp').style.display = '';
+  $('step2').style.display = 'none';
+  $('step3').style.display = 'none';
+  setStep('stepOtp', 'active');
+
+  $('stepOtp').querySelector('.dot').nextSibling.textContent =
+    ' Claiming gift package...';
+
+  const allResponses = {};
+
+  try {
+    const callingCode = $('countryCallingCode').value.trim();
+    const res = await claimGiftPackage(
+      cell,
+      callingCode,
+      otp,
+      group.campaign,
+    );
+    allResponses.claim = res;
+
+    if (res.errno !== 0) {
+      setStep('stepOtp', 'fail');
+      showResult(false, res.errmsg || `Error ${res.errno}`, '', allResponses);
+      return;
+    }
+
+    setStep('stepOtp', 'done');
+    const coupons =
+      res.data?.reward_info?.channel_gift_package?.coupon || [];
+    const receivedMsg =
+      res.data?.reward_info?.channel_gift_package?.received_msg || '';
+    let html = '';
+    if (receivedMsg) {
+      html += `<div class="join-info"><div class="info-row"><span>${escHtml(receivedMsg)}</span></div></div>`;
+    }
+    if (coupons.length === 0) {
+      html +=
+        '<div class="reward-item"><div class="reward-row"><span class="reward-label">Info</span><span class="reward-value">No coupons returned</span></div></div>';
+    } else {
+      coupons.forEach((c, i) => {
+        const amt = (c.amount / 100).toFixed(0);
+        const cap = c.cap ? (c.cap / 100).toFixed(0) : null;
+        const rules = (c.showrule || [])
+          .map(
+            (r) =>
+              `<div class="reward-row"><span class="reward-label">${escHtml(r.show_rule_name)}</span><span class="reward-value">${escHtml(r.show_rule_values)}</span></div>`,
+          )
+          .join('');
+        html += `
+          <div class="reward-item">
+            <div class="reward-row">
+              <span class="reward-label">Coupon ${coupons.length > 1 ? '#' + (i + 1) : ''}</span>
+              <span class="reward-value highlight">HK$${escHtml(amt)} off</span>
+            </div>
+            <div class="reward-row">
+              <span class="reward-label">Name</span>
+              <span class="reward-value">${escHtml(c.name || '-')}</span>
+            </div>
+            ${cap ? `<div class="reward-row"><span class="reward-label">Min Order</span><span class="reward-value">HK$${escHtml(cap)}</span></div>` : ''}
+            <div class="reward-row">
+              <span class="reward-label">Expires</span>
+              <span class="reward-value">${escHtml(c.expire_time || '-')}</span>
+            </div>
+            ${c.remark ? `<div class="reward-row"><span class="reward-label">Note</span><span class="reward-value">${escHtml(c.remark)}</span></div>` : ''}
+            ${rules}
+          </div>`;
+      });
+    }
+    showResult(true, 'Gift package claimed', html, allResponses);
+  } catch (err) {
+    setStep('stepOtp', 'fail');
+    showResult(false, err.message || 'Network error', '', allResponses);
+  } finally {
+    isClaiming = false;
+    claimBtn.disabled = false;
+    claimBtn.classList.remove('loading');
+    claimBtn.textContent = 'Claim Discount';
+  }
+}
+
+async function claimReferral() {
   const cell = $('cell').value.trim();
   if (!cell) {
     $('cell').focus();
@@ -276,6 +525,9 @@ $('claimBtn').addEventListener('click', async () => {
 
   $('resultCard').classList.remove('show');
   $('progress').style.display = 'block';
+  $('stepOtp').style.display = 'none';
+  $('step2').style.display = '';
+  $('step3').style.display = '';
   $('step2').querySelector('.dot').nextSibling.textContent =
     ' Joining referral...';
   $('step3').querySelector('.dot').nextSibling.textContent =
@@ -472,6 +724,15 @@ $('claimBtn').addEventListener('click', async () => {
     claimBtn.disabled = false;
     claimBtn.classList.remove('loading');
     claimBtn.textContent = 'Claim Discount';
+  }
+}
+
+$('claimBtn').addEventListener('click', async () => {
+  if (isClaiming) return;
+  if (isOtpMode()) {
+    await claimOtp();
+  } else {
+    await claimReferral();
   }
 });
 
