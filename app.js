@@ -79,7 +79,7 @@ function applyOtpModeToggle() {
   $('otpCard').style.display = otp ? '' : 'none';
   $('uidCard').style.display = otp ? 'none' : '';
 
-  if (otp && group.callingCode) {
+  if (otp && group.callingCode && !$('countryCallingCode').value.trim()) {
     $('countryCallingCode').value = group.callingCode;
   }
 }
