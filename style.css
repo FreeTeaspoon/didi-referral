@@ -155,8 +155,43 @@ select:focus {
 }
 
 .phone-row .code-field {
-  flex: 0 0 100px;
+  flex: 0 0 80px;
+  display: flex;
+  align-items: baseline;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
+
+.phone-row .code-field:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 102, 17, 0.08);
+}
+
+.calling-code-plus {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  padding: 0 2px 0 14px;
+  pointer-events: none;
+  user-select: none;
+  position: relative;
+  top: -1px;
+}
+
+.phone-row .code-field input {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding: 12px 10px 12px 2px;
+  width: 100%;
+}
+
+.phone-row .code-field input:focus {
+  border: none;
+  box-shadow: none;
+}
+
 .phone-row .number-field {
   flex: 1;
 }

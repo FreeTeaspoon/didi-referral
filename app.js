@@ -80,7 +80,7 @@ function applyOtpModeToggle() {
   $('uidCard').style.display = otp ? 'none' : '';
 
   if (otp && group.callingCode && !$('countryCallingCode').value.trim()) {
-    $('countryCallingCode').value = group.callingCode;
+    $('countryCallingCode').value = group.callingCode.replace(/^\+/, '');
   }
 }
 
@@ -281,7 +281,7 @@ $('sendCodeBtn').addEventListener('click', async () => {
   btn.textContent = 'Sending...';
 
   try {
-    const callingCode = $('countryCallingCode').value.trim();
+    const callingCode = '+' + $('countryCallingCode').value.trim();
     const res = await sendSmsCode(
       cell,
       callingCode,
@@ -444,7 +444,7 @@ async function claimOtp() {
   const allResponses = {};
 
   try {
-    const callingCode = $('countryCallingCode').value.trim();
+    const callingCode = '+' + $('countryCallingCode').value.trim();
     const res = await claimGiftPackage(
       cell,
       callingCode,
@@ -528,7 +528,7 @@ async function claimReferral() {
     return;
   }
 
-  const callingCode = $('countryCallingCode').value.trim();
+  const callingCode = '+' + $('countryCallingCode').value.trim();
   const actType = Number($('activityType').value);
   const tcIds = $('tcIdList')
     .value.split(',')
