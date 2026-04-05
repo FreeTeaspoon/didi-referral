@@ -349,6 +349,8 @@ function showResult(level, message, bodyHtml, rawData) {
 
   body.appendChild(toggleButton);
   body.appendChild(rawDiv);
+
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function escHtml(s) {

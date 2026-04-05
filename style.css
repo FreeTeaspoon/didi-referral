@@ -23,44 +23,6 @@
   --shadow: 1px 4px 10px -3px rgba(0, 0, 0, 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1a1a1a;
-    --surface: #262626;
-    --surface2: #333333;
-    --border: #404040;
-    --text: #e5e5e5;
-    --text-dim: #999999;
-    --shadow: 1px 4px 10px -3px rgba(0, 0, 0, 0.4);
-  }
-
-  .result-header.success {
-    background: #14532d;
-    border-bottom-color: #166534;
-  }
-  .result-header.warning {
-    background: #78350f;
-    border-bottom-color: #92400e;
-  }
-  .result-header.error {
-    background: #7f1d1d;
-    border-bottom-color: #991b1b;
-  }
-
-  .badge.success {
-    background: #166534;
-    color: #86efac;
-  }
-  .badge.warning {
-    background: #92400e;
-    color: #fde68a;
-  }
-  .badge.error {
-    background: #991b1b;
-    color: #fca5a5;
-  }
-}
-
 body {
   font-family:
     BlinkMacSystemFont,
@@ -130,7 +92,7 @@ label {
 input,
 select {
   width: 100%;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 12px 18px;
@@ -158,7 +120,7 @@ select:focus {
   flex: 0 0 80px;
   display: flex;
   align-items: baseline;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -576,7 +538,7 @@ select:focus {
   gap: 16px;
   margin-top: 10px;
   padding: 12px 18px;
-  background: #ffffff;
+  background: var(--surface);
   border: 1px dashed var(--border);
   border-radius: var(--radius);
   font-size: 0.82rem;
@@ -616,5 +578,43 @@ select:focus {
   }
   .field-grid {
     gap: 10px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a1a;
+    --surface: #262626;
+    --surface2: #333333;
+    --border: #404040;
+    --text: #e5e5e5;
+    --text-dim: #999999;
+    --shadow: 1px 4px 10px -3px rgba(0, 0, 0, 0.4);
+  }
+
+  .result-header.success {
+    background: #14532d;
+    border-bottom-color: #166534;
+  }
+  .result-header.warning {
+    background: #78350f;
+    border-bottom-color: #92400e;
+  }
+  .result-header.error {
+    background: #7f1d1d;
+    border-bottom-color: #991b1b;
+  }
+
+  .badge.success {
+    background: #166534;
+    color: #86efac;
+  }
+  .badge.warning {
+    background: #92400e;
+    color: #fde68a;
+  }
+  .badge.error {
+    background: #991b1b;
+    color: #fca5a5;
   }
 }
