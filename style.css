@@ -322,16 +322,26 @@ select:focus {
 }
 
 .progress {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 4px 20px;
   margin-top: 16px;
+  box-shadow: var(--shadow);
 }
 
 .step {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 0;
+  padding: 12px 0;
   font-size: 0.85rem;
   color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+
+.step:last-child {
+  border-bottom: none;
 }
 
 .step .dot {
