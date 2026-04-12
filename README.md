@@ -71,6 +71,67 @@ City configuration lives in `cities.js`. The data is structured as an array of c
 | `referrer`     | Human-readable referrer reward description  |
 | `tz`           | IANA timezone for "recent claim" detection  |
 
+## UI Design
+
+The interface is a single-column layout centered on the page, built entirely with vanilla HTML and CSS. All styling lives in `style.css` and uses CSS custom properties for theming.
+
+### Background and Color Scheme
+
+The page background uses a flat solid color controlled by the `--bg` custom property. In light mode this is `#ffffff` (white); in dark mode it switches to `#1a1a1a` (near-black) via a `prefers-color-scheme: dark` media query. The body is set to full viewport height (`min-height: 100vh`) with horizontal centering via flexbox, and content is constrained to a `540px` max-width container.
+
+Two surface-level color tiers sit on top of the background:
+
+| Variable     | Light         | Dark          | Used for                          |
+| ------------ | ------------- | ------------- | --------------------------------- |
+| `--bg`       | `#ffffff`     | `#1a1a1a`     | Page background, raw-JSON blocks  |
+| `--surface`  | `#ffffff`     | `#262626`     | Card backgrounds, inputs          |
+| `--surface2` | `#f5f5f5`     | `#333333`     | Reward items, join-info panels    |
+
+Borders (`--border`) are `#e5e5e5` in light / `#404040` in dark. Cards cast a subtle box shadow (`1px 4px 10px -3px`) whose opacity increases in dark mode. The accent color is DiDi orange (`#ff6611`), used for the heading highlight, buttons, active toggles, and focus rings.
+
+### Cards
+
+Cards are the primary layout containers. Each card is a `<div class="card">` with a white (or dark-surface) background, a `1px` solid border, `10px` border radius, `16px 20px` padding, `16px` bottom margin, and a light drop shadow. On narrow viewports (≤ 480 px) padding shrinks to `14px 16px`.
+
+The page renders the following cards top-to-bottom:
+
+| Card                | HTML id / class     | Visible when           | Contents                                                                                         |
+| ------------------- | ------------------- | ---------------------- | ------------------------------------------------------------------------------------------------ |
+| **Phone Number**    | `.card` (first)     | Always                 | Country calling code input (with `+` prefix) and phone number input, side by side in a flex row  |
+| **Country / City**  | `#countryCityCard`  | Always                 | Two-column grid with country and city `<select>` dropdowns; dashed-border info panels for discount/referrer values appear below each dropdown when a city is selected |
+| **UID**             | `#uidCard`          | Referral mode          | Two-column grid with UID and TC ID inputs; toggle switches for "Random UIDs" and "Manual Entry"  |
+| **Manual Fields**   | `#manualFields`     | Manual Entry toggle on | Five-field grid for activity ID, activity type, city ID, county ID, and country code             |
+| **OTP**             | `#otpCard`          | OTP mode               | OTP code input and "Send Code" button in a flex row                                              |
+
+Cards are shown or hidden via inline `style="display: none"` toggled by `app.js` when the country or manual-entry toggle changes.
+
+### Result Card
+
+The result card (`.result-card`, `#resultCard`) differs from input cards. It is hidden by default (`display: none`) and revealed with the `.show` class after a claim attempt. It has no padding of its own; instead it is split into two zones:
+
+- **Header** (`.result-header`) — colored background strip with a status badge and message. The background color changes by outcome: green (`#f0fdf4`) for success, amber (`#fffbeb`) for warning, red (`#fef2f2`) for error. In dark mode these shift to deep-tone equivalents (`#14532d`, `#78350f`, `#7f1d1d`).
+- **Body** (`.result-body`) — contains reward breakdown items (`.reward-item`) or coupon details, each on a secondary-surface (`--surface2`) background with rounded corners. A collapsible raw-JSON block (`.raw-json`) lets users inspect the full API response.
+
+### Badges
+
+Status badges (`.badge`) are pill-shaped labels (`border-radius: 9999px`) in the result header. They use semantic background/text color pairs: green for success, amber for warning, red for error, with inverted palettes in dark mode.
+
+### Buttons
+
+The primary action button (`#claimBtn`) spans the full container width with DiDi orange (`--accent`) background, white text, and `10px` border radius. On hover it darkens to `--accent-hover` (`#e8590a`); on click it scales down slightly (`scale(0.985)`). While a claim is in progress a CSS spinner appears via the `.loading` class. The "Send Code" button in the OTP card shares the same base style but is fixed at `120px` wide.
+
+### Progress Indicator
+
+The progress panel (`.progress`) appears between the button and result card during a claim. Each step is a flex row with a colored dot: grey (idle), pulsing orange (active), green (done), or red (failed). Steps are separated by `1px` bottom borders.
+
+### Dark Mode
+
+Dark mode activates automatically via `@media (prefers-color-scheme: dark)`. It overrides all CSS custom properties in `:root` — backgrounds darken, text lightens, borders become more subtle, and shadows deepen. Result-header and badge colors swap to dark-background/light-text versions to maintain contrast. No additional class or toggle is required.
+
+### Responsive Behavior
+
+A single `@media (max-width: 480px)` breakpoint reduces body padding from `48px 20px` to `32px 16px`, tightens card padding, and narrows field-grid gaps. The two-column field grids remain intact but with less spacing.
+
 ## Project Structure
 
 ```
