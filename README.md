@@ -91,7 +91,20 @@ Borders (`--border`) are `#e5e5e5` in light / `#404040` in dark. Cards cast a su
 
 ### Cards
 
-Cards are the primary layout containers. Each card is a `<div class="card">` with a white (or dark-surface) background, a `1px` solid border, `10px` border radius, `16px 20px` padding, `16px` bottom margin, and a light drop shadow. On narrow viewports (≤ 480 px) padding shrinks to `14px 16px`.
+Cards are the primary layout containers. Each card is a `<div class="card">` with `10px` border radius, `16px 20px` padding, and `16px` bottom margin. On narrow viewports (≤ 480 px) padding shrinks to `14px 16px`.
+
+**Background** — cards use the `--surface` color: `#ffffff` in light mode, `#262626` in dark mode. This matches the page background in light mode (both white) but lifts off the darker `#1a1a1a` page in dark mode, creating a visible card layer.
+
+**Border** — a `1px solid` line using `--border`: `#e5e5e5` (light) / `#404040` (dark).
+
+**Drop shadow** — defined by the `--shadow` custom property:
+
+| Mode  | Value                                    | Effect                                                        |
+| ----- | ---------------------------------------- | ------------------------------------------------------------- |
+| Light | `1px 4px 10px -3px rgba(0, 0, 0, 0.1)`  | 10 % black, offset 1 px right / 4 px down, 10 px blur, 3 px inward spread |
+| Dark  | `1px 4px 10px -3px rgba(0, 0, 0, 0.4)`  | 40 % black — same geometry but four times the opacity for visibility against the dark background |
+
+The shadow uses the same offsets and radii in both modes; only the alpha channel changes (`0.1` → `0.4`) so the shadow remains perceptible on dark surfaces without appearing heavy on light ones.
 
 The page renders the following cards top-to-bottom:
 
